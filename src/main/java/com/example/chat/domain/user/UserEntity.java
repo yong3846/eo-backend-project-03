@@ -3,7 +3,7 @@ package com.example.chat.domain.user;
 
 import com.example.chat.domain.BaseTimeEntity;
 import com.example.chat.domain.plan.PlanEntity;
-import com.example.chat.domain.user.user_enum.ChatId;
+import com.example.chat.domain.ChatId;
 import com.example.chat.domain.user.user_enum.UserRole;
 import com.example.chat.domain.user.user_enum.UserStatus;
 import jakarta.persistence.*;
@@ -51,9 +51,27 @@ public class UserEntity extends BaseTimeEntity {
     @Column(name = "remainingTokens", nullable = false)
     private int remainingTokens;
 
+
     // 비밀번호 재설정 토큰 로직
     private String resetToken;
     private LocalDateTime tokenExpiry;
+
+
+    // 비밀번호 변경 적용
+    public void updatePassword(String newPassword) {
+        this.password = newPassword;
+    }
+
+    // 비밀번호 재설정 토큰 발급
+    public void generateResetToken(String token) {
+        this.resetToken = token;
+    }
+
+    // 비밀번호 변경 완료 후 토큰 폐기
+    public void clearResetToken() {
+        this.resetToken = null;
+    }
+
 
     // 비즈니스 로직: 토큰 차감 메서드
     public void decreaseTokens(int usedTokens) {
@@ -62,6 +80,18 @@ public class UserEntity extends BaseTimeEntity {
         }
         this.remainingTokens -= usedTokens;
     }
+
+
+    // 정보 수정
+    public void updateProfile(String username, String encodePassword) {
+        if (username != null && !username.isBlank()) {
+            this.username = username;
+        }
+        if (encodePassword != null && !encodePassword.isBlank()) {
+            this.password = encodePassword;
+        }
+    }
+
 
     // 회원 탈퇴
     public void withdraw() {
